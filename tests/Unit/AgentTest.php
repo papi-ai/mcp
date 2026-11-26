@@ -91,3 +91,48 @@ describe('An agent with MCP tools', function () {
         expect($agent->run('Try the failing tool')->text)->toBe('{"error":"The fixture always fails."}');
     });
 });
+
+describe('A server tool without parameters', function () {
+    it('reaches the provider with its properties as an object', function () {
+        $provider = new class () implements ProviderInterface {
+            public array $tools = [];
+
+            public function chat(array $messages, array $options = []): Response
+            {
+                $this->tools = $options['tools'] ?? [];
+
+                return new Response(text: 'done');
+            }
+
+            public function stream(array $messages, array $options = []): iterable
+            {
+                return [];
+            }
+
+            public function supportsTool(): bool
+            {
+                return true;
+            }
+
+            public function supportsVision(): bool
+            {
+                return false;
+            }
+
+            public function supportsStructuredOutput(): bool
+            {
+                return false;
+            }
+
+            public function getName(): string
+            {
+                return 'recording';
+            }
+        };
+        $server = new McpServer(fixtureServer(), only: ['ping']);
+
+        Agent::build()->provider($provider)->model('recording')->tools($server->tools())->create()->run('Ping the server.');
+
+        expect(json_encode($provider->tools))->toBe('[{"name":"ping","description":"Answers pong","parameters":{"type":"object","properties":{}}}]');
+    });
+});

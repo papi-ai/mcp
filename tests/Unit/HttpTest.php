@@ -56,7 +56,7 @@ describe('McpServer over Streamable HTTP', function () {
         $tools = $server->tools();
         $add = array_values(array_filter($tools, static fn ($tool): bool => $tool->getName() === 'add'))[0];
 
-        expect(count($tools))->toBe(5);
+        expect(count($tools))->toBe(6);
         expect($add->execute(['a' => 20, 'b' => 22]))->toBe(['sum' => 42]);
         expect($client->getProtocolVersion()?->value)->toBe($era);
     })->with([

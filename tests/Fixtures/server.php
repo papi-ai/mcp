@@ -45,6 +45,7 @@ $builder = Server::builder()
         throw new ToolCallException('The fixture always fails.');
     }, 'fail', description: 'Always reports a failure')
     ->addTool(static fn (): string => 'alice, bob', 'admin.users.list', description: 'Lists the users')
+    ->addTool(static fn (): string => 'pong', 'ping', description: 'Answers pong')
     ->addTool(static fn (): ImageContent => new ImageContent(base64_encode('not really a png'), 'image/png'), 'picture', title: 'A picture');
 
 if (in_array('collide', $flags, true)) {
