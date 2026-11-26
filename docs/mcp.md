@@ -24,7 +24,7 @@ use PapiAI\Core\Agent;
 use PapiAI\Mcp\McpServer;
 
 $github = new McpServer(
-    new StdioTransport('npx', ['-y', '@modelcontextprotocol/server-github'], env: [...getenv(), 'GITHUB_TOKEN' => $token]),
+    new StdioTransport('npx', ['-y', '@modelcontextprotocol/server-github'], env: ['PATH' => getenv('PATH'), 'GITHUB_PERSONAL_ACCESS_TOKEN' => $token]),
 );
 
 $agent = Agent::build()
@@ -35,7 +35,7 @@ $agent = Agent::build()
 echo $agent->run('Which issues are open on papi-ai/mcp?')->text;
 ```
 
-The client speaks protocol revision `2026-07-28` and falls back to the `initialize` handshake (up to `2025-11-25`) for servers that predate it, so both kinds work without configuration. The connection opens on first use; `disconnect()` closes it, and stops a stdio server's process. A tool run after that connects again.
+The client speaks protocol revision `2026-07-28` and falls back to the `initialize` handshake (up to `2025-11-25`) for servers that predate it, so both kinds work without configuration. The connection is made on the first call to `tools()` or to a tool, not in the constructor, so an unreachable server or a wrong name in `only` shows up at first use. `disconnect()` closes it, and stops a stdio server's process. A tool run after that connects again.
 
 ### A remote server
 
@@ -93,7 +93,7 @@ See the SDK's [client documentation](https://github.com/modelcontextprotocol/php
 
 ## Security
 
-An MCP tool runs code you do not control, and its description is written by the server, so treat both as untrusted. Hand over only the tools the agent needs with `only`, and confirm sensitive calls in the agent's `beforeToolCall` hook.
+An MCP tool runs code you do not control, and its description is written by the server, so treat both as untrusted. Hand over only the tools the agent needs with `only`, and confirm sensitive calls in the agent's `beforeToolCall` hook. Pass a stdio server only the environment variables it needs, as the example does: it runs as a separate program with whatever you give it, and `getenv()` would give it every secret your application holds.
 
 ## Requirements
 

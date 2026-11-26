@@ -47,7 +47,7 @@ describe('McpServer', function () {
 
         $tools = byName($server->tools());
 
-        expect(array_keys($tools))->toBe(['echo', 'add', 'fail', 'admin_users_list', 'picture']);
+        expect(array_keys($tools))->toBe(['echo', 'add', 'fail', 'admin_users_list', 'ping', 'picture']);
         expect($client->getProtocolVersion()?->value)->toBe($era);
         $server->disconnect();
     })->with('eras');
@@ -78,7 +78,7 @@ describe('McpServer', function () {
 
     it('prefixes every tool name', function () {
         expect(array_keys(byName((new McpServer(fixtureServer(), prefix: 'fx'))->tools())))
-            ->toBe(['fx_echo', 'fx_add', 'fx_fail', 'fx_admin_users_list', 'fx_picture']);
+            ->toBe(['fx_echo', 'fx_add', 'fx_fail', 'fx_admin_users_list', 'fx_ping', 'fx_picture']);
     });
 
     it('hands over only the tools asked for', function () {
@@ -89,7 +89,7 @@ describe('McpServer', function () {
 
     it('refuses a tool asked for that the server does not list', function () {
         (new McpServer(fixtureServer(), only: ['echo', 'delete_everything']))->tools();
-    })->throws(McpException::class, 'The MCP server "papi-fixture" lists no tool "delete_everything". It lists: "echo", "add", "fail", "admin.users.list", "picture".');
+    })->throws(McpException::class, 'The MCP server "papi-fixture" lists no tool "delete_everything". It lists: "echo", "add", "fail", "admin.users.list", "ping", "picture".');
 
     it('refuses two tools that would reach the model under one name', function () {
         (new McpServer(fixtureServer(['collide'])))->tools();
